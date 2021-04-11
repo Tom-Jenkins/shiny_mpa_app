@@ -205,7 +205,7 @@ save(spa_sweng, file = "../devon_cornwall_scilly_mpa_app/data/spa_sweng.RData")
 
 # ----------------- #
 #
-# JNCC Marine Habitat Data  UKSeaMap 2018 v1
+# JNCC Marine Habitat Data (UKSeaMap 2018 v1)
 #
 # ----------------- #
 

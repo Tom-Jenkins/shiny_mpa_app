@@ -1,4 +1,4 @@
-# Devon, Cornwall & Isles of Scilly MPA App
+# Devon, Cornwall & Isles of Scilly Inshore MPA App
 
 This repository contains the R code used to generate this interactive R Shiny app.
 

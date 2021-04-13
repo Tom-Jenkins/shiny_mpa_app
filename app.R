@@ -205,7 +205,6 @@ l = l %>%
 
 # Define distinct colours using randomcoloR package
 # substrate_cols = distinctColorPalette(k = length(unique(seamap_sub$Substrate)))
-### ADD DATASETS HERE
 # Define colour palette for JNCC layer
 jncc_cols = distinctColorPalette(k = length(unique(seamap_sub$JNCCName)))
 
@@ -286,7 +285,8 @@ server = function(input, output, session){
 # )
 
 # Date updated
-date_updated = format(Sys.Date(), "%d %B %Y")
+# date_updated = format(Sys.Date(), "%d %B %Y")
+date_updated = "13 April 2021"
 
 ui = bootstrapPage(
 

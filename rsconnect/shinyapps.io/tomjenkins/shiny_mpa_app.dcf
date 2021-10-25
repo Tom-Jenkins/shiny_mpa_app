@@ -1,0 +1,11 @@
+name: shiny_mpa_app
+title:
+username:
+account: tomjenkins
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 4948532
+bundleId: 5173767
+url: https://tomjenkins.shinyapps.io/shiny_mpa_app/
+when: 1635150725.24901
+lastSyncTime: 1635150725.24901

@@ -18,6 +18,8 @@ library(shinythemes)
 library(sf)
 library(leaflet)
 library(leaflet.providers)
+library(leaflet.extras)
+library(leafem)
 library(htmltools)
 library(DT)
 library(tidyverse)
@@ -38,8 +40,8 @@ feature_table$`Protected Feature` = factor(feature_table$`Protected Feature`,
                                            levels = levels(feature_table$`Protected Feature`) %>% sort)
 
 # Edit names of some habitat types
-seamap_sub$JNCCName = str_replace(seamap_sub$JNCCName,"Infralittoral sandy mud or Infralittoral fine mud", "Infralittoral sandy / fine mud")
-seamap_sub$JNCCName = str_replace(seamap_sub$JNCCName, "Offshore circalittoral fine sand or Offshore circalittoral muddy sand","Offshore circalittoral fine / muddy sand")
+# seamap_sub$JNCCName = str_replace(seamap_sub$JNCCName,"Infralittoral sandy mud or Infralittoral fine mud", "Infralittoral sandy / fine mud")
+# seamap_sub$JNCCName = str_replace(seamap_sub$JNCCName, "Offshore circalittoral fine sand or Offshore circalittoral muddy sand","Offshore circalittoral fine / muddy sand")
 
 
 # ----------------- #
@@ -50,20 +52,24 @@ seamap_sub$JNCCName = str_replace(seamap_sub$JNCCName, "Offshore circalittoral f
 
 # Basemap
 l = leaflet() %>%
-  # fitBounds(lng1 = -5.0, lng2 = -4.5, lat1 = 49.8, lat2 = 50.8) %>% 
-  setView(lng = -4.173326, lat = 50.63338, zoom = 8) %>%   
+  # setView(lng = -4.173326, lat = 50.63338, zoom = 8) %>%
+  # Add mouse coordinates at top of map
+  addMouseCoordinates() %>%
   # Add an inset minimap button
   addMiniMap(
     position = "topright",
     tiles = providers$Esri.WorldStreetMap,
     toggleDisplay = TRUE) %>%
-  # Add a zoom to level buttom
-  addEasyButton(easyButton(
-    icon = "fa-globe", title = "Zoom to Level 8",
-    onClick = JS("function(btn, map){ map.setZoom(8); }"))) %>%
-  addEasyButton(easyButton(
-    icon = "fa-crosshairs", title = "Locate Me",
-    onClick = JS("function(btn, map){ map.locate({setView: true}); }"))) %>% 
+  # Add scalebar
+  addScaleBar(position = "bottomright",
+              options = scaleBarOptions(imperial = FALSE)) %>% 
+  # Reset map to default setting
+  addResetMapButton() %>% 
+  # Add measurement tool
+  addMeasure(position = "topleft",
+             primaryLengthUnit = "meters",
+             secondaryLengthUnit = "kilometers",
+             primaryAreaUnit = "sqmeters") %>% 
   # select basemap http://leaflet-extras.github.io/leaflet-providers/preview/index.html
   addProviderTiles(providers$OpenStreetMap, group = "Open Street Map") %>%
   # addProviderTiles(providers$Stamen.Terrain, group = "Stamen Terrain") %>% 
@@ -186,62 +192,64 @@ l = l %>%
 #   unique(seamap_sub$Substrate)
 # ) %>% lapply(htmltools::HTML)
 
-# Define colour palette for substrate layer
-factpal = colorFactor("Dark2", domain = seamap_sub$Substrate)
-
-# Add UKSeaMap substrate data to basemap
-l = l %>% 
-  # Add polygons
-  addPolygons(data = seamap_sub, stroke = TRUE, weight = 0.1, color = "white", opacity = 1,
-              # label = substrate_labs,
-              fillOpacity = 0.7, fillColor = ~factpal(Substrate),
-              group = "Broad-Scale Substrate Types"
-              ) %>% 
-  # Add legend
-  addLegend(pal = factpal, values = seamap_sub$Substrate, opacity = 0.7,
-            title = "Broad-Scale Substrate Types", position = "bottomleft",
-            group = "Broad-Scale Substrate Types"
-            )
-
-# Define distinct colours using randomcoloR package
-# substrate_cols = distinctColorPalette(k = length(unique(seamap_sub$Substrate)))
-# Define colour palette for JNCC layer
-jncc_cols = distinctColorPalette(k = length(unique(seamap_sub$JNCCName)))
-
-# Show colours using scales package
-# library(scales)
-# show_col(jncc_cols)
-
-# Add UKSeaMap JNCC broad habitat data to basemap
-l = l %>% 
-  # Add polygons
-  addPolygons(data = seamap_sub, stroke = TRUE, weight = 0.1, color = "white", opacity = 1,
-              # label = substrate_labs,
-              fillOpacity = 0.7, fillColor = jncc_cols,
-              # highlight = highlightOptions(color = "#666",
-              #                              weight = 1,
-              #                              fillOpacity = 0.7,
-              #                              sendToBack =  TRUE),
-              group = "Broad-Scale Seabed Habitats"
-  ) %>% 
-  # Add legend
-  addLegend(colors = jncc_cols, labels = unique(seamap_sub$JNCCName), opacity = 0.7,
-            title = "Broad-Scale Seabed Habitats", position = "bottomleft",
-            group = "Broad-Scale Seabed Habitats"
-  )
+# # Define colour palette for substrate layer
+# factpal = colorFactor("Dark2", domain = seamap_sub$Substrate)
+# 
+# # Add UKSeaMap substrate data to basemap
+# l = l %>% 
+#   # Add polygons
+#   addPolygons(data = seamap_sub, stroke = TRUE, weight = 0.1, color = "white", opacity = 1,
+#               # label = substrate_labs,
+#               fillOpacity = 0.7, fillColor = ~factpal(Substrate),
+#               group = "Broad-Scale Substrate Types"
+#               ) %>% 
+#   # Add legend
+#   addLegend(pal = factpal, values = seamap_sub$Substrate, opacity = 0.7,
+#             title = "Broad-Scale Substrate Types", position = "bottomleft",
+#             group = "Broad-Scale Substrate Types"
+#             )
+# 
+# # Define distinct colours using randomcoloR package
+# # substrate_cols = distinctColorPalette(k = length(unique(seamap_sub$Substrate)))
+# # Define colour palette for JNCC layer
+# jncc_cols = distinctColorPalette(k = length(unique(seamap_sub$JNCCName)))
+# 
+# # Show colours using scales package
+# # library(scales)
+# # show_col(jncc_cols)
+# 
+# # Add UKSeaMap JNCC broad habitat data to basemap
+# l = l %>% 
+#   # Add polygons
+#   addPolygons(data = seamap_sub, stroke = TRUE, weight = 0.1, color = "white", opacity = 1,
+#               # label = substrate_labs,
+#               fillOpacity = 0.7, fillColor = jncc_cols,
+#               # highlight = highlightOptions(color = "#666",
+#               #                              weight = 1,
+#               #                              fillOpacity = 0.7,
+#               #                              sendToBack =  TRUE),
+#               group = "Broad-Scale Seabed Habitats"
+#   ) %>% 
+#   # Add legend
+#   addLegend(colors = jncc_cols, labels = unique(seamap_sub$JNCCName), opacity = 0.7,
+#             title = "Broad-Scale Seabed Habitats", position = "bottomleft",
+#             group = "Broad-Scale Seabed Habitats"
+#   )
 
 
 # Layers control
 l = l %>% addLayersControl(
       baseGroups = c("Open Street Map", "ESRI World Topo Map", "ESRI World Imagery",
                      "ESRI Ocean Basemap"),
-      overlayGroups = c("Broad-Scale Substrate Types", "Broad-Scale Seabed Habitats",
-                        "Special Protection Areas",
+      overlayGroups = c("Special Protection Areas",
+                        # "Broad-Scale Substrate Types", "Broad-Scale Seabed Habitats",
                         "Marine Conservation Zones", "Special Areas of Conservation",
                         "Bristol Channel Approaches SAC"),
       options = layersControlOptions(collapsed = TRUE)
   ) %>%
-  hideGroup(c("Broad-Scale Substrate Types","Broad-Scale Seabed Habitats","Bristol Channel Approaches SAC"))
+  hideGroup(c("Bristol Channel Approaches SAC"
+              # "Broad-Scale Substrate Types","Broad-Scale Seabed Habitats"
+              ))
 
 
 # ----------------- #
@@ -254,21 +262,28 @@ server = function(input, output, session){
   # Leaflet map
   output$map1 = renderLeaflet({ l })
   # Table
-  output$tableDT = DT::renderDataTable(feature_table,
-                                       rownames = FALSE,
-                                       filter = "top",
-                                       extensions = 'Buttons',
-                                       options = list(
-                                         paging = FALSE,
-                                         dom = "Bfrtip",
-                                         buttons = list("copy",
-                                                        list(
-                                           extend = "collection",
-                                           buttons = c("csv", "excel", "pdf"),
-                                           text = "Download")
-                                            )
-                                         )
-                                       )
+  DT_filename = "table_download"
+  output$tableDT = DT::renderDataTable(
+    feature_table,
+    rownames = FALSE,
+    filter = "top",
+    extensions = 'Buttons',
+    options = list(
+     paging = FALSE,
+     dom = "Bfrtip",
+     buttons = list(
+       "copy",
+       list(
+         extend = "collection",
+         buttons = list(
+           list(extend = "csv", filename = DT_filename),
+           list(extend = "excel", filename = DT_filename),
+           list(extend = "pdf", filename = DT_filename)
+         ),
+         text = "Download")
+       )
+     )
+    )
 }
 
 
@@ -309,10 +324,10 @@ ui = bootstrapPage(
                         tags$h4("About this app"),
                         "This app provides an interactive framework for users to visualise and retrieve information
                         about inshore Marine Protected Areas (MPAs) designated around Devon, Cornwall and the Isles of Scilly.
-                        The Map contains layers for all types of MPAs (MCZs, SACs and SPAs) designated as of April 2021, as well as two layers
-                        that show broad-scale substrate types and seabed habitats. The Features table contains
+                        The Map contains layers for all types of MPAs (MCZs, SACs and SPAs) designated as of April 2021. The Features table contains
                         information about the feature(s) each MPA has been designated to protect and is intended
-                        to enable users to quickly find out which MPAs cover a particular feature of interest or vice versa.",
+                        to enable users to quickly find out which MPAs cover a particular feature of interest or vice versa.
+                        To copy a set of GPS coordinates, press ctrl + left-click on the map and then paste.",
                         "Click",
                           tags$a(href = "https://tomjenkins.shinyapps.io/devon_cornwall_scilly_mpa_app/",
                                "here"),

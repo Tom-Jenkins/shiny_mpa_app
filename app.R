@@ -15,22 +15,21 @@
 # Load packages
 library(shiny)
 library(shinythemes)
-library(sf)
 library(leaflet)
 library(leaflet.providers)
 library(leaflet.extras)
 library(leafem)
 library(htmltools)
 library(DT)
-library(tidyverse)
-library(randomcoloR)
+library(dplyr)
+library(readr)
 
 # Load data sets
 load("data/mcz_sweng.RData")
 load("data/sac_sweng.RData")
 load("data/sac_porpoise.RData")
 load("data/spa_sweng.RData")
-load("data/seamap_sweng.RData")
+# load("data/seamap_sweng.RData")
 
 # Import csv table
 feature_table = read_csv("data/mpa_data.csv", col_types = "ffff")
@@ -210,6 +209,7 @@ l = l %>%
 #             )
 # 
 # # Define distinct colours using randomcoloR package
+# # library(randomcoloR)
 # # substrate_cols = distinctColorPalette(k = length(unique(seamap_sub$Substrate)))
 # # Define colour palette for JNCC layer
 # jncc_cols = distinctColorPalette(k = length(unique(seamap_sub$JNCCName)))
